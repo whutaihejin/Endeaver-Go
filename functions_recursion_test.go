@@ -53,6 +53,34 @@ func TestLinks(t *testing.T) {
 	}
 }
 
+func Outline(stack []string, n *html.Node) {
+	if n == nil {
+		return
+	}
+	if n.Type == html.ElementNode {
+		stack = append(stack, n.Data)
+		fmt.Println(stack)
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		Outline(stack, c)
+	}
+}
+
+func TestOutline(t *testing.T) {
+	url := "https://golang.org"
+	r, err := Fetch(url)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Fetch %s error %s\n", url, err.Error())
+		os.Exit(1)
+	}
+	doc, err := html.Parse(r)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Parse html error %s\n", err.Error())
+		os.Exit(2)
+	}
+	Outline(nil, doc)
+}
+
 // Exercise 5.1
 func VisitV2(links []string, n *html.Node) []string {
 	if n.Type == html.ElementNode && n.Data == "a" {
@@ -90,34 +118,6 @@ func TestVisitV2(t *testing.T) {
 }
 
 // Ex 5.2
-func Outline(stack []string, n *html.Node) {
-	if n == nil {
-		return
-	}
-	if n.Type == html.ElementNode {
-		stack = append(stack, n.Data)
-		fmt.Println(stack)
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		Outline(stack, c)
-	}
-}
-
-func TestOutline(t *testing.T) {
-	url := "https://golang.org"
-	r, err := Fetch(url)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Fetch %s error %s\n", url, err.Error())
-		os.Exit(1)
-	}
-	doc, err := html.Parse(r)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Parse html error %s\n", err.Error())
-		os.Exit(2)
-	}
-	Outline(nil, doc)
-}
-
 func CalEntryMap(kv map[string]int, n *html.Node) {
 	if n == nil {
 		return
@@ -149,6 +149,7 @@ func TestMap(t *testing.T) {
 	}
 }
 
+// Exercise 5.3
 func ExtractText(n *html.Node) {
 	if n == nil {
 		return
@@ -178,14 +179,23 @@ func TestText(t *testing.T) {
 	ExtractText(doc)
 }
 
-func ExtendVisit(links []string, n *html.Node) []string {
-	for _, a := range n.Attr {
-		if a.Key == "src" {
-			links = append(links, a.Val)
+
+// Exercise 5.4
+var mapping = map[string]string{"a": "href", "img": "src", "script": "src", "link": "href"}
+
+func ExtendVisit(target string, links []string, n *html.Node) []string {
+	if n == nil {
+		return links
+	}
+	if n.Type == html.ElementNode && n.Data == target {
+		for _, a := range n.Attr {
+			if a.Key == mapping[target] {
+				links = append(links, a.Val)
+			}
 		}
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		links = ExtendVisit(links, c)
+		links = ExtendVisit(target, links, c)
 	}
 	return links
 }
@@ -202,7 +212,10 @@ func TestExtentVisit(t *testing.T) {
 		fmt.Fprintf(os.Stderr, "Parse html error %s\n", err.Error())
 		os.Exit(2)
 	}
-	for _, link := range ExtendVisit(nil, doc) {
-		fmt.Println(link)
+	for target, _ := range mapping {
+		fmt.Println("==========>", target)
+		for _, link := range ExtendVisit(target, nil, doc) {
+			fmt.Println(link)
+		}
 	}
 }
