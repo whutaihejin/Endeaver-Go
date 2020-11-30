@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+func square() func() int {
+    var x int
+    return func() int {
+        x++
+        return x * x
+    }
+}
 
 func main() {
-	fmt.Println("hello world!")
+    f := square()
+    f()
+    f()
 }
