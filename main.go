@@ -1,6 +1,6 @@
 package main
 
-func square() func() int {
+func closure() func() int {
     var x int
     return func() int {
         x++
@@ -9,7 +9,7 @@ func square() func() int {
 }
 
 func main() {
-    f := square()
+    f := closure()
     f()
     f()
 }
