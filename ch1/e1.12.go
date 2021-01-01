@@ -10,11 +10,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
-	"sync"
 )
-
-var mu sync.Mutex
-var count int
 
 func main() {
 	// handler echoes the Path component of the requested URL.
@@ -26,20 +22,20 @@ func main() {
 		if len(r.Form["cycles"]) > 0 {
 			cycles, _ = strconv.Atoi(r.Form["cycles"][0])
 		}
-		lissajous(w, cycles)
+		lissajous12(w, cycles)
 	}
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 
-var palette = []color.Color{color.White, color.Black}
+var palette12 = []color.Color{color.White, color.Black}
 
 const (
-	whiteIndex = 0 // first color in palette
-	blackIndex = 1 // next color in palette
+	whiteIndex12 = 0 // first color in palette
+	blackIndex12 = 1 // next color in palette
 )
 
-func lissajous(out io.Writer, cycles int) {
+func lissajous12(out io.Writer, cycles int) {
 	const (
 		res    = 0.001 // angular resolution
 		size   = 300   // image canvas covers[-size..+size]
@@ -55,7 +51,7 @@ func lissajous(out io.Writer, cycles int) {
 		for t := 0.0; t < float64(cycles)*2*math.Pi; t += res {
 			x := math.Sin(t)
 			y := math.Sin(t*freq + phase)
-			img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5), blackIndex)
+			img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5), blackIndex12)
 		}
 		phase += 0.1
 		anim.Delay = append(anim.Delay, delay)

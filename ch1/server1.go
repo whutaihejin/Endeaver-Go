@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", handler1)
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 
 // handler echoes the Path component of the request URL r.
-func handler(w http.ResponseWriter, r *http.Request) {
+func handler1(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "URL.path = %q\n", r.URL.Path)
 }
