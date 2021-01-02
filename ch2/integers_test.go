@@ -1,10 +1,10 @@
-package ch2
+package main
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
-import "github.com/stretchr/testify/assert"
 
 func TestArithmetic(t *testing.T) {
 	mask := uint32(0xffff)
